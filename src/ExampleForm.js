@@ -3,24 +3,47 @@ import React, { useState } from "react";
 export function ExampleForm(props) {
 
   //const [name, setName] = useState("");
-
+  
   const [dirtyState, setDirtyState] = useState({});
   const [formState, setFormState] = useState({
     //Name: "mka",
     //Address: "rådal"
   })
 
+  const isFilled = (val) => {
+    console.log ('validating', val)
+    let result = 'OK'
+    if (new String(val).valueOf() !== new String('MKA').valueOf()) 
+      result = 'Navn ikke mka'
+    console.log ('validating', val, ' res;', result)
+    return result
+  }
+  const [validatorsState, setValidatorsState] = useState({
+    Name: [
+      () => {isFilled(() => formState.Name)}
+      ]
+  });
+
   const handleChange = (e) => {
-    console.log(e.target.name);
-    console.log(e.target.value);
+    //console.log(e.target.name);
+    //console.log(e.target.value);
+
+    let fieldName = e.target.name
+    let fieldValue = e.target.value
+
     setFormState(
-      (prevState => ({...prevState, [e.target.name]: e.target.value})))
+      (prevState => ({...prevState, [fieldName]: fieldValue})))
 
     setDirtyState(
-      (prevState => ({...prevState, [e.target.name]: true})))
+      (prevState => ({...prevState, [fieldName]: true})))
 
-    console.log(JSON.stringify(formState))
-    console.log(JSON.stringify(dirtyState))
+    let validators = validatorsState[fieldName]
+    validatorsState.Name[0]()
+    console.log (validators)
+    
+
+    //console.log(JSON.stringify(formState))
+    //console.log(JSON.stringify(dirtyState))
   }
   
   const handleSubmit = (evt) => {
@@ -50,10 +73,15 @@ export function ExampleForm(props) {
           onChange={handleChange}
         />
       </label>
-
+      
+      <br/>
       <input type="submit" value="Submit" />
       <br/>
       {JSON.stringify(formState)}
+      {JSON.stringify(dirtyState)}
+      {JSON.stringify(validatorsState)}
+      <br />
+      //val:{validatorsState.Name[0]()}
 
     </form>
   );
