@@ -1,115 +1,55 @@
 import React, { useState } from "react";
+import { useUcForm } from './useUcForm'
+import { isNotBlank, isMKA, minLength3 } from './validators'
 
 export function ExampleForm(props) {
 
-  //const [name, setName] = useState("");
-  
-  //const [dirtyState, setDirtyState] = useState({});
-  const [errorMessages, setErrorMessages] = useState({});
-  const [formState, setFormState] = useState({
+  const formValues = {
     Name: '',
     Address: ''
-  })
-
-  const isNotBlank= (val, name) => {
-    //console.log ('is not blank', val)
-    if (val) return '' 
-    else return 'Feltet påkrevd. '
-  } 
-  const isFilled = (val, name) => {
-    //console.log ('isFilled', val)
-    let result = ''
-    if (val !== 'MKA')    
-      result = 'Feltet må inneholde "MKA"'
-    //console.log ('validating', val, ' result: ', result)
-    return result
   }
 
-  const [validatorsState, setValidatorsState] = useState({
+  const formValidators = {
     Name: [
-      isFilled,
-      isNotBlank
-      ]
-  });
-
-  const validateField = (fieldName, fieldValue) => {
-
-    if (validatorsState[fieldName]) {
-      let fieldErrors = validatorsState[fieldName].reduce((errors, valFunc) =>{
-        return errors = `${errors}${valFunc(fieldValue, fieldName)} `
-      }, '')
-      
-      setErrorMessages(
-        (prevState => ({...prevState, [fieldName]: fieldErrors})))
-    }
+      isNotBlank,
+      minLength3
+    ]
   }
 
-  const handleChange = (e) => {
-    
-    // Get name and input
-    let fieldName = e.target.name
-    let fieldValue = e.target.value
+  const {
+    handleChange, formState, validateField,
+    validateAll, errorMessages, formIsValid,
+    validatorsState } = useUcForm(formValues, formValidators)
 
-    validateField(fieldName, fieldValue)   
-    // If field has validators run them all
-    /*
-    if (validatorsState[fieldName]) {
-      let fieldErrors = validatorsState[fieldName].reduce((errors, valFunc) =>{
-        return errors = `${errors}${valFunc(fieldValue, fieldName)} `
-      }, '')
-      
-      setErrorMessages(
-        (prevState => ({...prevState, [fieldName]: fieldErrors})))
-    }*/
-
-    setFormState(
-      (prevState => ({...prevState, [fieldName]: fieldValue})))
-
-    //setDirtyState(
-    //  (prevState => ({...prevState, [fieldName]: true})))
-
-  }
-
-  
-
-  const validateAll = () => {
-    console.log('Check if all fields are OK')
-    let hasErrors = false;
-
-    for (const fieldName of Object.keys(formState)) {
-      const fieldValue = formState[fieldName];
-      console.log('Check:', fieldName, fieldValue)
-
-      validateField(fieldName, fieldValue)      
-    }
-   
-  }
-
-  
   const handleSubmit = (evt) => {
-      evt.preventDefault();
-      validateAll();
-      //alert(`Submitting Name ${name}`)
+    evt.preventDefault();
+    validateAll();
+    //alert(`Submitting Name ${name}`)
   }
+  const isRed = { color: 'red' };
+
   return (
     <form onSubmit={handleSubmit}>
 
-      <label>First Name:</label><br/>
-      <input type="text" name="Name" value={formState.Name} onChange={handleChange}/>
-      {errorMessages.Name}<br/>
+      {!formIsValid && <div style={isRed}>form is not valid<br /><br /></div>}
 
-      <label>Address:</label><br/>
-      <input type="text" name="Address" value={formState.Address} onChange={handleChange} /><br/>
-      
-      <br/>
-      <input type="submit" value="Submit" />
-      <br/>
-      <br/>
-      val:{JSON.stringify(formState)}<br/>      
-      errors: {JSON.stringify(errorMessages)}<br/>      
+      <label>First Name:</label><br />
+      <input type="text" name="Name" value={formState.Name} onChange={handleChange} />
+      <div style={isRed}>{errorMessages.Name}</div><br />
+
+      <label>Address:</label><br />
+      <input type="text" name="Address" value={formState.Address} onChange={handleChange} /><br />
+      <div style={isRed}>{errorMessages.Address}</div><br />
+
       <br />
-      
+      <input type="submit" value="Submit" />
+      <br />
+      <br />
+      val:{JSON.stringify(formState)}<br />
+      errors: {JSON.stringify(errorMessages)}<br />
+      validators: {JSON.stringify(formValidators)}
+      <br />
 
     </form>
-  );
+  )
 }
