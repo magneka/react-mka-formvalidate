@@ -21,3 +21,17 @@ export const isMKA = (val, name) => {
     //console.log ('validating', val, ' result: ', result)
     return result
 }
+
+export const ValidEmailaddress = (val, name) => {
+    if (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(val)) 
+        return ''
+    else     
+        return `${val} is not a valid email address.`
+}
+
+export const isNumber = (val, name) => {
+    console.log ('isNumber', val, isNaN(val))
+    if (isNaN(val))
+        return `${val} is not a valid number.`
+    return ''
+}

@@ -2,9 +2,7 @@ import { useState } from "react";
 
 export const useUcForm = (initialValues, validators) => {
     const [formState, setFormState] = useState(initialValues)
-    const [validatorsState, setValidatorsState] = useState(validators);
-
-    const [formIsValid, setFormIsValid] = useState(true)
+    const [validatorsState] = useState(validators);
     const [errorMessages, setErrorMessages] = useState({});
 
     // **********************************************************************
@@ -12,8 +10,6 @@ export const useUcForm = (initialValues, validators) => {
     // **********************************************************************
     const validateField = (fieldName, fieldValue) => {
         console.log(fieldName, fieldValue, validatorsState[fieldName])
-
-        setFormIsValid(true)
 
         if (validatorsState[fieldName]) {
 
@@ -23,12 +19,11 @@ export const useUcForm = (initialValues, validators) => {
                 if (typeof valFunc == 'function') {
                     return errors = `${errors}${valFunc(fieldValue, fieldName)} `
                 }
+                else {
+                    return errors
+                }
 
             }, '')
-
-            if (fieldErrors !== null && fieldErrors.trim() !== '') {
-                setFormIsValid(false)
-            }
 
             setErrorMessages(
                 (prevState => ({ ...prevState, [fieldName]: fieldErrors })))
@@ -39,8 +34,7 @@ export const useUcForm = (initialValues, validators) => {
     // Routine validates all fields, to check if form can be submitted
     // *********************************************************************
     const validateAll = () => {
-        console.log('Check if all fields are OK')
-        let hasErrors = false;
+        //console.log('Check if all fields are OK')        
 
         for (const fieldName of Object.keys(formState)) {
             const fieldValue = formState[fieldName];
@@ -55,7 +49,7 @@ export const useUcForm = (initialValues, validators) => {
     // *********************************************************************
     const handleChange = (e) => {
 
-        setFormIsValid(true)
+        //console.log('handleChange', e.target.name, e.target.value)
 
         // Get name and input
         let fieldName = e.target.name
@@ -63,18 +57,25 @@ export const useUcForm = (initialValues, validators) => {
 
         validateField(fieldName, fieldValue)
 
+        canBeSubmitted()
+
         setFormState(
             (prevState => ({ ...prevState, [fieldName]: fieldValue })))
 
     }
 
     // *********************************************************************
-    //
+    // Check if there ara non empty values in errorMessages state object
     // *********************************************************************
     const canBeSubmitted = () => {
+        let result = true
+        for (const fieldName of Object.keys(errorMessages)) {
 
+            if (errorMessages[fieldName].trim() !==  '')
+                result = false;
+        }
+        return result
     }
 
-
-    return { handleChange, formState, validateField, validateAll, errorMessages, formIsValid, validatorsState }
+    return { handleChange, formState, validateAll, errorMessages, canBeSubmitted }
 }
