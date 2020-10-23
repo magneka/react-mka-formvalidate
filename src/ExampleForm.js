@@ -5,7 +5,7 @@ import { isNotBlank, minLength3, ValidEmailaddress, isNumber } from './validator
 export function ExampleForm(props) {
 
   const formValues = {
-    Name: 'a',
+    Name: '',
     Address: '',
     Email: '',
     Age: ''
@@ -17,10 +17,8 @@ export function ExampleForm(props) {
     Age: [ isNotBlank, isNumber ]  
   }
 
-  const {
-    handleChange, formState, 
-    validateAll, errorMessages, 
-    canBeSubmitted } = useUcForm(formValues, formValidators)
+  const { handleChange, formState, validateAll, errorMessages, canBeSubmitted }
+    = useUcForm(formValues, formValidators)
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
@@ -37,7 +35,7 @@ export function ExampleForm(props) {
         <input           
           type="text"         
           name={props.name}
-          value={formState['Name']}
+          value={formState[props.name]}
           onChange={handleChange} />
         <br />
         <div style={isRed}>{errorMessages[props.name]}</div><br />
@@ -50,23 +48,11 @@ export function ExampleForm(props) {
 
       {!canBeSubmitted() && <div style={isRed}>Unable to submit data due to errors in input, please correct<br /><br /></div>}
 
-      {renderFormField({ caption: 'First name', name:'Name', formState:formState, handleChange:handleChange })}
+      {renderFormField({ caption: 'Full name', name: 'Name' })}
+      {renderFormField({ caption: 'Home Address', name: 'Address'})}
+      {renderFormField({ caption: 'Email address', name: 'Email'})}
+      {renderFormField({ caption: 'Users Age', name: 'Age'})}
      
-      
-      <label>Address:</label><br />
-      <input type="text" name="Address" value={formState.Address} onChange={handleChange} /><br />
-      <div style={isRed}>{errorMessages.Address}</div><br />
-
-      <label>Email:</label><br />
-      <input type="text" name="Email" value={formState.Email} onChange={handleChange} /><br />
-      <div style={isRed}>{errorMessages.Email}</div><br />
-
-      <label>Age:</label><br />
-      <input type="text" name="Age" value={formState.Age} onChange={handleChange} /><br />
-      <div style={isRed}>{errorMessages.Age}</div><br />
-
-      
-
       <br />
       <input type="submit" value="Submit" />
       <br />
